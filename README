@@ -1,0 +1,9 @@
+# Because of a hard disk failure I have to rebuild all my projects
+
+# Kickstart
+This is a framework I use to make a quick prototype or develop my project with.
+
+It is build using the MVC method and includes the following libraries/frameworks for creating the front-end
+- HTML5 boilerplate
+- Twitter bootstrap
+- Jquery
