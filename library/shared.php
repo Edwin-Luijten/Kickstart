@@ -180,6 +180,30 @@ function randomAlphaNum($length)
     return $string;
 }
 
+function error($err)
+{
+	if((int)$err === 404)
+	{
+		$error_header = "HTTP/1.1 404 Not Found";
+	}
+	elseif((int)$err === 403)
+	{
+		$error_header = "HTTP/1.1 403 Forbidden";
+	}
+	elseif((int)$err === 301)
+	{
+		$error_header = "HTTP/1.1 301 Moved Permanently";
+	}
+	elseif((int)$err === 500)
+	{
+		$error_header = "HTTP/1.1 500 Internal Server Error";
+	}
+	
+	header($error_header);
+	include('../public/'.$err.'.html');
+	exit;
+}
+
 /** Main Call Function **/
 function callHook()
 {
@@ -189,38 +213,58 @@ function callHook()
 
     $queryString = array();
 
-    if($url === FALSE){
+    if($url === FALSE)
+    {
 		$controller = $default['controller'];
 		$action = $default['action'];
-    }else{
+    }
+    else
+    {
 		$url = routeURL($url);
 		$urlArray = array();
 		$urlArray = explode("/",$url);
 		$controller = $urlArray[0];
+		
 		array_shift($urlArray);
-		if (isset($urlArray[0])){
+		
+		if (isset($urlArray[0]))
+		{
 		    $action = $urlArray[0];
 		    array_shift($urlArray);
-		} else {
+		} 
+		else 
+		{
 		    $action = 'index'; // Default Action
 		}
+		
 		$queryString = $urlArray;
     }
     
     $controllerName = ucfirst($controller).'Controller';
 
-    $dispatch = new $controllerName($controller,$action);
-    
-    if((int)method_exists($controllerName, $action))
-    {
-		call_user_func_array(array($dispatch,"beforeAction"),$queryString);
-		call_user_func_array(array($dispatch,$action),$queryString);
-		call_user_func_array(array($dispatch,"afterAction"),$queryString);
-    }
-    else
-    {
-		/* Error Generation Code Here */
-    }
+	if(class_exists($controllerName))
+	{
+	    if((int)method_exists($controllerName, $action))
+	    {
+	    	$dispatch = new $controllerName($controller, $action);
+	    	
+			call_user_func_array(array($dispatch,"beforeAction"),$queryString);
+			call_user_func_array(array($dispatch,$action),$queryString);
+			call_user_func_array(array($dispatch,"afterAction"),$queryString);
+	    }
+	    else
+	    {
+			/* Error Generation Code Here */
+			error(404);
+	    }
+	}
+	else {
+		{
+			/* Error Generation Code Here */
+			echo 'Class does not exists';
+			exit;		
+		}
+	}
 }
 
 
@@ -244,6 +288,7 @@ function __autoload($className)
     else
     {
 		/* Error Generation Code Here */
+		error(404);	
     }
     
     foreach($config['framework']['modules']  as $module)

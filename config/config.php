@@ -12,8 +12,7 @@ $config['db']['password'] = "";
 $config['db']['type'] = "";
 $config['db']['file'] = "";
 
-/* remove this line to enable cache
 $config['cache']['path'] = "../tmp/cache/";
 $config['cache']['priority'] = 50;
-remove this line to enable cache */
-?>	
+
+?>

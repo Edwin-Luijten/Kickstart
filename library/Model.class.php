@@ -13,7 +13,7 @@ class Model
 			$this->_cache = new Cache($config['cache']['path'], $config['cache']['priority']);
 		}
 		
-		$this->_model = get_class($this);
+		$this->_model = get_class($this);	
     }
 
     function __destruct(){
