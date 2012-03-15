@@ -9,13 +9,17 @@
 global $config;
 
 /** Check if environment is development and display errors **/
-function setReporting(){
+function setReporting()
+{
     global $config;
     
-    if($config['framework']['development_environment'] == true){
+    if($config['framework']['development_environment'] == true)
+    {
 		error_reporting(E_ALL);
 		ini_set('display_errors','On');
-    }else{
+    }
+    else
+    {
 		error_reporting(E_ALL);
 		ini_set('display_errors','Off');
 		ini_set('log_errors', 'On');
@@ -28,7 +32,8 @@ function setReporting(){
  *@param: array
  *@return: array
 **/
-function stripSlashesDeep($value){
+function stripSlashesDeep($value)
+{
     $value = is_array($value) ? array_map('stripSlashesDeep', $value) : stripslashes($value);
     
     return $value;
@@ -38,8 +43,10 @@ function stripSlashesDeep($value){
  *Removes magic quotes
  *@return: void
 **/
-function removeMagicQuotes(){
-    if(get_magic_quotes_gpc()){
+function removeMagicQuotes()
+{
+    if(get_magic_quotes_gpc())
+    {
 		$_GET = stripSlashesDeep($_GET);
 		$_POST = stripSlashesDeep($_POST);
 		$_COOKIE = stripSlashesDeep($_COOKIE);
@@ -50,12 +57,18 @@ function removeMagicQuotes(){
  *Check register globals and remove them
  *@return: void
 **/
-function unregisterGlobals(){
-    if (ini_get('register_globals')){
+function unregisterGlobals()
+{
+    if (ini_get('register_globals'))
+    {
         $array = array('_SESSION', '_POST', '_GET', '_COOKIE', '_REQUEST', '_SERVER', '_ENV', '_FILES');
-        foreach($array as $value){
-            foreach($GLOBALS[$value] as $key => $var){
-                if($var === $GLOBALS[$key]){
+        
+        foreach($array as $value)
+        {
+            foreach($GLOBALS[$value] as $key => $var)
+            {
+                if($var === $GLOBALS[$key])
+                {
                     unset($GLOBALS[$key]);
                 }
             }
@@ -68,7 +81,8 @@ function unregisterGlobals(){
  *@param: controller [string], action, [string], queryString [array], render [int]
  *@return: value of callback or false
 **/
-function performAction($controller,$action,$queryString = null,$render = 0){
+function performAction($controller,$action,$queryString = null,$render = 0)
+{
     $controllerName = ucfirst($controller).'Controller';
     $dispatch = new $controllerName($controller,$action);
     $dispatch->render = $render;
@@ -77,11 +91,14 @@ function performAction($controller,$action,$queryString = null,$render = 0){
 }
 
 /** Routing **/
-function routeURL($url){
+function routeURL($url)
+{
     global $routing;
 
-    foreach($routing as $pattern => $result){
-		if(preg_match($pattern, $url)){
+    foreach($routing as $pattern => $result)
+    {
+		if(preg_match($pattern, $url))
+		{
 		    return preg_replace($pattern, $result, $url);
 		}
     }
@@ -94,7 +111,8 @@ function routeURL($url){
  *@param int
  *@return string [name of requested url segment]
 **/
-function getSegment($segmentPart){
+function getSegment($segmentPart)
+{
     //Full path
     $path = trim($_SERVER['REQUEST_URI'], '/');
     
@@ -102,7 +120,8 @@ function getSegment($segmentPart){
     $segment = explode('/', $path);
     
     //Check if $segment[$segmentPart] is set else it gives undefined offset with no segments in the url
-    if(isset($segment[$segmentPart])){
+    if(isset($segment[$segmentPart]))
+    {
        return $segment[$segmentPart]; 
     }      
 }
@@ -112,13 +131,22 @@ function getSegment($segmentPart){
  *@param none
  *@return string [current page url]
 **/ 
-function curPageURL(){
+function curPageURL()
+{
     $pageURL = 'http';
-    if ($_SERVER["HTTPS"] == "on") {$pageURL .= "s";}
-    	$pageURL .= "://";
-    if($_SERVER["SERVER_PORT"] != "80"){
+    
+    if ($_SERVER["HTTPS"] == "on") {
+    	$pageURL .= "s";
+    }
+    
+    $pageURL .= "://";
+    
+    if($_SERVER["SERVER_PORT"] != "80")
+    {
 		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
-    }else{
+    }
+    else
+    {
 		$pageURL .= $_SERVER["SERVER_NAME"].$_SERVER["REQUEST_URI"];
     }
     
@@ -130,7 +158,8 @@ function curPageURL(){
  *@param int
  *@return alpha numeric string of given length
  **/
-function randomAlphaNum($length){
+function randomAlphaNum($length)
+{
     $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
     // Length of character list
     $chars_length = (strlen($chars) - 1);
@@ -139,7 +168,8 @@ function randomAlphaNum($length){
     $string = $chars{rand(0, $chars_length)};
    
     // Generate random string
-    for ($i = 1; $i < $length; $i = strlen($string)){
+    for ($i = 1; $i < $length; $i = strlen($string))
+    {
         // Grab a random character from our list
         $r = $chars{rand(0, $chars_length)};
        
@@ -151,7 +181,8 @@ function randomAlphaNum($length){
 }
 
 /** Main Call Function **/
-function callHook(){
+function callHook()
+{
     global $url;
     global $default;
     global $config;
@@ -180,42 +211,57 @@ function callHook(){
 
     $dispatch = new $controllerName($controller,$action);
     
-    if((int)method_exists($controllerName, $action)){
+    if((int)method_exists($controllerName, $action))
+    {
 		call_user_func_array(array($dispatch,"beforeAction"),$queryString);
 		call_user_func_array(array($dispatch,$action),$queryString);
 		call_user_func_array(array($dispatch,"afterAction"),$queryString);
-    }else{
-	/* Error Generation Code Here */
+    }
+    else
+    {
+		/* Error Generation Code Here */
     }
 }
 
 
 /** Autoload any classes/modules that are required **/
-function __autoload($className){
+function __autoload($className)
+{
     global $config;
     
-    if(file_exists(ROOT . DS . 'library' . DS . $className . '.class.php')){
+    if(file_exists(ROOT . DS . 'library' . DS . $className . '.class.php'))
+    {
 		require_once(ROOT . DS . 'library' . DS . $className . '.class.php');
-    }elseif(file_exists(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php')){
+    }
+    elseif(file_exists(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php'))
+    {
 		require_once(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php');
-    }elseif(file_exists(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php')){
+    }
+    elseif(file_exists(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php'))
+    {
 		require_once(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php');
-    }else{
-	/* Error Generation Code Here */
+    }
+    else
+    {
+		/* Error Generation Code Here */
     }
     
-    foreach($config['framework']['modules']  as $module){
-		if(file_exists(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php')){
+    foreach($config['framework']['modules']  as $module)
+    {
+		if(file_exists(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php'))
+		{
 		    require_once(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php');	
 		}
     }
 }
 
 /** GZip Output **/
-function gzipOutput(){
+function gzipOutput()
+{
     $ua = $_SERVER['HTTP_USER_AGENT'];
 
-    if (0 !== strpos($ua, 'Mozilla/4.0 (compatible; MSIE ') || false !== strpos($ua, 'Opera')){
+    if (0 !== strpos($ua, 'Mozilla/4.0 (compatible; MSIE ') || false !== strpos($ua, 'Opera'))
+    {
         return false;
     }
 
@@ -228,9 +274,11 @@ gzipOutput() || ob_start("ob_gzhandler");
 
 setReporting();
 
-if(isset($url)){
+if(isset($url))
+{
 
-}else{
+}
+else{
     $url = FALSE;
 }
 

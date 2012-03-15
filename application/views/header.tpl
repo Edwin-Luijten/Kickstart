@@ -7,7 +7,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-  <title><?=$title?></title>
+  <title><?= $title ?></title>
+  <base href="<?= BASE_URL ?>/" />
   <meta name="description" content="">
   <meta name="author" content="">
 
@@ -39,7 +40,7 @@
 	            <ul class="nav">
 	
 	              <li class="active"><a href="#">Home</a></li>
-	              <li><a href="#about">Documentation</a></li>
+	              <li><a href="index/documentation">Documentation</a></li>
 	            </ul>
 	          </div><!--/.nav-collapse -->
 	        </div>

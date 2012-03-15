@@ -1,9 +1,7 @@
 <?php
-$config['framework']['development_environment'] = "";
-$config['framework']['localize'] = false; //true or false
-	
 $config['app']['name'] = "Kickstart";
 $config['app']['url'] = "http://edwin-luijten.nl/sandbox/kickstart";
+define("BASE_URL", $config['app']['url']);
 $config['app']['path'] = "";
 $config['app']['lang'] = "en";
 	
@@ -18,5 +16,4 @@ $config['db']['file'] = "";
 $config['cache']['path'] = "../tmp/cache/";
 $config['cache']['priority'] = 50;
 remove this line to enable cache */
-?>
-	
+?>	
