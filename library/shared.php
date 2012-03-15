@@ -22,18 +22,7 @@ function setReporting(){
 		ini_set('error_log', ROOT.DS.'tmp'.DS.'logs'.DS.'error.log');
     }
 }
-/**
- *Check if framework is configured
-**/
-function is_configured(){
-    global $url;
-    
-    if($url == 'setup' || $url == 'setup/save'){
-	
-    }elseif(file_exists('../config/config.default.php')){
-		header('location: setup');
-    }
-}
+
 /**
  *Check for Magic Quotes and remove them
  *@param: array
@@ -216,8 +205,8 @@ function __autoload($className){
     }
     
     foreach($config['framework']['modules']  as $module){
-		if(file_exists(ROOT . DS . 'application/modules' . DS . $module . DS . $module . '.module.php')){
-		    require_once(ROOT . DS . 'application/modules' . DS . $module . DS . $module . '.module.php');	
+		if(file_exists(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php')){
+		    require_once(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php');	
 		}
     }
 }
@@ -248,6 +237,5 @@ if(isset($url)){
 new Locale($config['framework']['localize'], $config['app']['lang']);
 removeMagicQuotes();
 unregisterGlobals();
-is_configured();
 callHook();
 ?>

@@ -15,6 +15,7 @@
 
   <!-- CSS concatenated and minified via ant build script-->
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
   <!-- end CSS-->
 
   <script src="js/libs/modernizr-2.0.6.min.js"></script>
@@ -24,6 +25,26 @@
 
   <div id="container">
     <header>
-
+	    <div class="navbar navbar-fixed-top">
+	      <div class="navbar-inner">
+	        <div class="container">
+	
+	          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+	            <span class="icon-bar"></span>
+	          </a>
+	          <a class="brand" href="#">Kickstart</a>
+	          <div class="nav-collapse">
+	            <ul class="nav">
+	
+	              <li class="active"><a href="#">Home</a></li>
+	              <li><a href="#about">Documentation</a></li>
+	            </ul>
+	          </div><!--/.nav-collapse -->
+	        </div>
+	      </div>
+	
+	    </div>
     </header>
-    <div id="main" role="main">
+    <div id="main" role="main" class="container">
