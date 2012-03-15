@@ -19,7 +19,7 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <!-- end CSS-->
 
-  <script src="js/libs/modernizr-2.0.6.min.js"></script>
+  <script src="js/libs/modernizr-2.5.2.min.js"></script>
 </head>
 
 <body>
@@ -38,8 +38,6 @@
 	          <a class="brand" href="#">Kickstart</a>
 	          <div class="nav-collapse">
 	            <ul class="nav">
-	
-	              <li class="active"><a href="#">Home</a></li>
 	              <li><a href="http://www.edwin-luijten.nl/#kickstart-documentation" target="_blank" class="documentation-link">Documentation</a></li>
 	            </ul>
 	          </div><!--/.nav-collapse -->
