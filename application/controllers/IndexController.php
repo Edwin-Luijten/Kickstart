@@ -11,7 +11,7 @@ class IndexController extends Controller
 
     function index()
     {	
-		$this->set('title', 'Welcome to Kickstart');	
+		$this->set('title', 'Welcome to Kickstart');
     }
     
     function documentation()

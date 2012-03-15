@@ -1,12 +1,14 @@
 <?php
-class Database{
+class Database
+{
     protected $host;
     protected $name;
     protected $user;
     protected $pass;
     protected $type;
     
-    public function connect(){
+    public function connect()
+    {
 		global $config;
 		
 		$this->host = $config['db']['host'];
@@ -16,24 +18,34 @@ class Database{
 		$this->file = $config['db']['file'];
 		$this->type = $config['db']['type'];
 	
-		if($this->type == 'mysql' || $this->type == 'mssql' || $this->type == 'sysbase'){
-		    try{
+		if($this->type == 'mysql' || $this->type == 'mssql' || $this->type == 'sysbase')
+		{
+		    try
+		    {
 				return  new PDO("{$this->type}:host={$this->host};dbname={$this->name}", $this->user, $this->pass);
-		    }catch(PDOException $e){
+		    }
+		    catch(PDOException $e)
+		    {
 				print "Error!: " . $e->getMessage() . "<br/>";
 				die();
 		    } 
-		}elseif($this->type == 'sqlite'){
-		    try{
+		}
+		elseif($this->type == 'sqlite')
+		{
+		    try
+		    {
 				return new PDO("sqlite:{$this->file}");
-		    }catch(PDOException $e){
+		    }
+		    catch(PDOException $e)
+		    {
 				print "Error!: " . $e->getMessage() . "<br/>";
 				die();
 		    }
 		}
     }
     
-    public static function disconnect(){
+    public static function disconnect()
+    {
 		return null;
     }
 

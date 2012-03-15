@@ -40,7 +40,7 @@
 	            <ul class="nav">
 	
 	              <li class="active"><a href="#">Home</a></li>
-	              <li><a href="index/documentation">Documentation</a></li>
+	              <li><a href="http://www.edwin-luijten.nl/#kickstart-documentation" target="_blank" class="documentation-link">Documentation</a></li>
 	            </ul>
 	          </div><!--/.nav-collapse -->
 	        </div>

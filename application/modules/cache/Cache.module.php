@@ -7,8 +7,8 @@
 * @date: 29 January 2011, 11:45 PM
 */
 
-class Cache{
-
+class Cache
+{
 	private $required_variables = array('caching_path','priority_required');
 	
 	private $caching_path = "";
@@ -19,17 +19,24 @@ class Cache{
 	* 	Retrieve configuration variables to correctly setup the caching environment.
 	* 	@param string|array $caching_path Absolute path to the configuration file where we can find environment related variable. OR array with required variables already pulled from the config file.
 	*/
-	function Cache($cache_path, $cache_priority) {
-	    if(!isset($cache_path)){
-		$cache_path = "../tmp/cache/";
-	    }else{
-		$this->caching_path = $cache_path;
+	function Cache($cache_path, $cache_priority)
+	{
+	    if(!isset($cache_path))
+	    {
+			$cache_path = "../tmp/cache/";
+	    }
+	    else
+	    {
+			$this->caching_path = $cache_path;
 	    }
 	    
-	    if(!isset($cache_priority)){
-		$cache_priority = 0;
-	    }else{
-		$this->priority_required = $cache_priority;
+	    if(!isset($cache_priority))
+	    {
+			$cache_priority = 0;
+	    }
+	    else
+	    {
+			$this->priority_required = $cache_priority;
 	    }
 	}
 
@@ -40,8 +47,8 @@ class Cache{
 	*	@param int $duration Time you want to keep the content cached (in SECONDS). If $duration = 0, we'll keep the file cached for ever.
 	*	@return bool Simply returns true if the process has been successful.
 	*/
-	function cache_content($name,$content,$duration = 0) {
-	
+	function cache_content($name,$content,$duration = 0)
+	{
 		$filename = $this->caching_path . $this->_encrypt_name($name);
 		
 		$content = array(
@@ -64,24 +71,31 @@ class Cache{
 	* 	@param int $priority Integer between 0 and 100 to know whether we cache the content or not.
 	* 	@return bool False if the cache has expired or doesn't exist (or priority is too  low).
 	*/
-	function retrieve_cache($name,$priority = 0) {
-	
+	function retrieve_cache($name,$priority = 0)
+	{
 		$filename = $this->caching_path . $this->_encrypt_name($name);
 		
 		if($priority < $this->priority_required)
+		{
 			return false;
-			
-		if(!file_exists($filename))
+		}
+		elseif(!file_exists($filename))
+		{
 			return false;
+		}
 		
 		$content = file_get_contents($filename);
 		$content = unserialize($content);
 		
-		if($content['duration'] == 0){
+		if($content['duration'] == 0)
+		{
 			return $content;
-		}elseif(time() > $content['creation']+$content['duration']){
+		}elseif(time() > $content['creation']+$content['duration'])
+		{
 			return false;
-		}else{
+		}
+		else
+		{
 		    return $content['content'];
 		}
 	}
@@ -91,9 +105,11 @@ class Cache{
 	/**
 	*	Start the caching buffer
 	*/
-	function start_buffer() {
+	function start_buffer()
+	{
 		// we don't need to handle multiple buffers for simple content caching
-		if(!$this->has_buffer_started){
+		if(!$this->has_buffer_started)
+		{
 			ob_start();
 			$this->has_buffer_started = true;
 		}
@@ -102,8 +118,10 @@ class Cache{
 	/**
 	*	Stop the caching buffer
 	*/
-	function stop_buffer() {
-		if($this->has_buffer_started){
+	function stop_buffer()
+	{
+		if($this->has_buffer_started)
+		{
 			$content = ob_get_clean();
 			$this->buffer_content = $content;
 			$this->has_buffer_started = false;
@@ -116,9 +134,11 @@ class Cache{
 	*	@param int $duration Time you want to keep the content cached. If $duration = 0, we'll keep the file cached for ever.
 	*	@return bool True if the process has been successful
 	*/
-	function cache_buffer($name,$duration = 0) {
+	function cache_buffer($name,$duration = 0)
+	{
 		// buffer has already been opened and closed
-		if(!$this->has_buffer_started) {
+		if(!$this->has_buffer_started)
+		{
 			// simply use the method we already written earlier.
 			$this->cache_content($name,$this->buffer_content,$duration);
 		}
@@ -129,12 +149,19 @@ class Cache{
 	*	@param string $name Name of the caching file.
 	*	@return bool False if file doesn't exist, true if the process has been successful.
 	*/
-	function delete_cache($name) {
+	function delete_cache($name)
+	{
 		$filename = $this->caching_path . $this->_encrypt_name($name);
+		
 		if(!file_exists($filename))
+		{
 			return false;
+		}
 		else
+		{
 			unlink($filename);
+		}
+		
 		return true;
 	}
 		
@@ -143,7 +170,8 @@ class Cache{
 	*	@param string $name Cache variable name
 	*	@access private
 	*/
-	function _encrypt_name($name) {
+	function _encrypt_name($name)
+	{
 		return md5($name);
 	}
 

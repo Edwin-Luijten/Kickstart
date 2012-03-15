@@ -77,9 +77,13 @@ td { vertical-align: top; }
 /*
  * Site styling
  */
+.documentation-link {
+	target-new: tab !important; /*Not yet supported by anny browser*/
+}
 #main {
 	margin-top: 60px;
 }
+
 /*
  * Media queries
  */
