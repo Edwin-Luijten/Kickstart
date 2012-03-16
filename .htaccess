@@ -302,10 +302,21 @@ FileETag None
 
 # Turning on the rewrite engine is necessary for the following rules and features.
 # FollowSymLinks must be enabled for this to work.
+# Turn on URL rewriting
 
 <IfModule mod_rewrite.c>
-  Options +FollowSymlinks
+  #Options +FollowSymlinks
   RewriteEngine On
+
+  # Installation directory
+    RewriteBase /
+
+
+    # Allow any files or directories that exist to be displayed directly
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rewrite all other URLs to index.php/URL
     RewriteRule    ^$    public/    [L]
     RewriteRule    (.*) public/$1    [L]
 </IfModule>
