@@ -1,19 +1,20 @@
 <?php
 /**
- *@author: Edwin Luijten
- *@package: Framework
- *@filesource: framework/library/
- *Description: Contains functions to fire up te framework and functions for use elsewhere in the framework
- *Included in: Framework/library/bootstrap.php
+ * @author: Edwin Luijten
+ * @package: Framework
+ * @filesource: framework/library/
+ * Description: Contains functions to fire up te framework and functions for use elsewhere in the framework
+ * Included in: Kickstart/library/shared.php
 **/
 global $config;
+$magic_quotes = FALSE;
 
 /** Check if environment is development and display errors **/
 function setReporting()
 {
     global $config;
     
-    if($config['framework']['development_environment'] == true)
+    if ($config['framework']['development_environment'] == true)
     {
 		error_reporting(E_ALL);
 		ini_set('display_errors','On');
@@ -28,54 +29,92 @@ function setReporting()
 }
 
 /**
- *Check for Magic Quotes and remove them
- *@param: array
- *@return: array
+ * Check for Magic Quotes and remove them
+ * @param: array
+ * @return: array
 **/
 function stripSlashesDeep($value)
 {
+	
     $value = is_array($value) ? array_map('stripSlashesDeep', $value) : stripslashes($value);
     
     return $value;
 }
 
 /**
- *Removes magic quotes
- *@return: void
-**/
-function removeMagicQuotes()
-{
-    if(get_magic_quotes_gpc())
-    {
-		$_GET = stripSlashesDeep($_GET);
-		$_POST = stripSlashesDeep($_POST);
-		$_COOKIE = stripSlashesDeep($_COOKIE);
-    }
-}
-
-/**
- *Check register globals and remove them
- *@return: void
+ * Check register globals and remove them
+ * @return: void
 **/
 function unregisterGlobals()
 {
-    if (ini_get('register_globals'))
-    {
-        $array = array('_SESSION', '_POST', '_GET', '_COOKIE', '_REQUEST', '_SERVER', '_ENV', '_FILES');
-        
-        foreach($array as $value)
-        {
-            foreach($GLOBALS[$value] as $key => $var)
-            {
-                if($var === $GLOBALS[$key])
-                {
-                    unset($GLOBALS[$key]);
-                }
-            }
-        }
-    }
+	if (isset($_REQUEST['GLOBALS']) OR isset($_FILES['GLOBALS']))
+	{
+		// Prevent malicious GLOBALS overload attack
+		echo "Global variable overload attack detected! Request aborted.\n";
+
+		// Exit with an error status
+		exit(1);
+	}
+
+	// Get the variable names of all globals
+	$global_variables = array_keys($GLOBALS);
+
+	// Remove the standard global variables from the list
+	$global_variables = array_diff($global_variables, array(
+		'_COOKIE',
+		'_ENV',
+		'_GET',
+		'_FILES',
+		'_POST',
+		'_REQUEST',
+		'_SERVER',
+		'_SESSION',
+		'GLOBALS',
+	));
+
+	foreach ($global_variables as $name)
+	{
+		// Unset the global variable, effectively disabling register_globals
+		unset($GLOBALS[$name]);
+	}
 }
 
+/**
+ * Recursively sanitizes an input variable:
+ *
+ * - Strips slashes if magic quotes are enabled
+ * - Normalizes all newlines to LF
+ * 
+ * @param   mixed  any variable
+ * @return  mixed  sanitized variable
+ */
+function sanitize($value)
+{
+	if (is_array($value) OR is_object($value))
+	{
+		foreach ($value as $key => $val)
+		{
+			// Recursively clean each value
+			$value[$key] = sanitize($val);
+		}
+	}
+	elseif (is_string($value))
+	{
+		if (Kohana::$magic_quotes === TRUE)
+		{
+			// Remove slashes added by magic quotes
+			$value = stripslashes($value);
+		}
+
+		if (strpos($value, "\r") !== FALSE)
+		{
+			// Standardize newlines
+			$value = str_replace(array("\r\n", "\r"), "\n", $value);
+		}
+	}
+
+	return $value;
+}
 /**
  *Secondary Call Function
  *@param: controller [string], action, [string], queryString [array], render [int]
@@ -95,9 +134,9 @@ function routeURL($url)
 {
     global $routing;
 
-    foreach($routing as $pattern => $result)
+    foreach ($routing as $pattern => $result)
     {
-		if(preg_match($pattern, $url))
+		if (preg_match($pattern, $url))
 		{
 		    return preg_replace($pattern, $result, $url);
 		}
@@ -120,7 +159,7 @@ function getSegment($segmentPart)
     $segment = explode('/', $path);
     
     //Check if $segment[$segmentPart] is set else it gives undefined offset with no segments in the url
-    if(isset($segment[$segmentPart]))
+    if (isset($segment[$segmentPart]))
     {
        return $segment[$segmentPart]; 
     }      
@@ -141,7 +180,7 @@ function curPageURL()
     
     $pageURL .= "://";
     
-    if($_SERVER["SERVER_PORT"] != "80")
+    if ($_SERVER["SERVER_PORT"] != "80")
     {
 		$pageURL .= $_SERVER["SERVER_NAME"].":".$_SERVER["SERVER_PORT"].$_SERVER["REQUEST_URI"];
     }
@@ -180,21 +219,21 @@ function randomAlphaNum($length)
     return $string;
 }
 
-function error($err)
+function errorPage($err)
 {
-	if((int)$err === 404)
+	if ((int)$err === 404)
 	{
 		$error_header = "HTTP/1.1 404 Not Found";
 	}
-	elseif((int)$err === 403)
+	elseif ((int)$err === 403)
 	{
 		$error_header = "HTTP/1.1 403 Forbidden";
 	}
-	elseif((int)$err === 301)
+	elseif ((int)$err === 301)
 	{
 		$error_header = "HTTP/1.1 301 Moved Permanently";
 	}
-	elseif((int)$err === 500)
+	elseif ((int)$err === 500)
 	{
 		$error_header = "HTTP/1.1 500 Internal Server Error";
 	}
@@ -213,7 +252,7 @@ function callHook()
 
     $queryString = array();
 
-    if($url === FALSE)
+    if ($url === FALSE)
     {
 		$controller = $default['controller'];
 		$action = $default['action'];
@@ -242,9 +281,9 @@ function callHook()
     
     $controllerName = ucfirst($controller).'Controller';
 
-	if(class_exists($controllerName))
+	if (class_exists($controllerName))
 	{
-	    if((int)method_exists($controllerName, $action))
+	    if ((int)method_exists($controllerName, $action))
 	    {
 	    	$dispatch = new $controllerName($controller, $action);
 	    	
@@ -255,7 +294,7 @@ function callHook()
 	    else
 	    {
 			/* Error Generation Code Here */
-			error(404);
+			errorPage(404);
 	    }
 	}
 	else {
@@ -273,29 +312,33 @@ function __autoload($className)
 {
     global $config;
     
-    if(file_exists(ROOT . DS . 'library' . DS . $className . '.class.php'))
+    if (file_exists(ROOT . DS . 'library' . DS . $className . '.class.php'))
     {
 		require_once(ROOT . DS . 'library' . DS . $className . '.class.php');
     }
-    elseif(file_exists(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php'))
+    elseif (file_exists(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php'))
     {
 		require_once(ROOT . DS . 'application' . DS . 'controllers' . DS . $className . '.php');
     }
-    elseif(file_exists(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php'))
+    elseif (file_exists(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php'))
     {
 		require_once(ROOT . DS . 'application' . DS . 'models' . DS . $className . '.php');
     }
     else
     {
 		/* Error Generation Code Here */
-		error(404);	
+		errorPage(404);	
     }
     
     foreach($config['framework']['modules']  as $module)
     {
-		if(file_exists(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php'))
+		if (file_exists(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php'))
 		{
 		    require_once(ROOT . DS . 'application/modules' . DS . strtolower($module) . DS . $module . '.module.php');	
+		}
+		else
+		{
+			echo 'Module '. $module .' does not exist.';	
 		}
     }
 }
@@ -328,7 +371,21 @@ else{
 }
 
 new Locale($config['framework']['localize'], $config['app']['lang']);
-removeMagicQuotes();
-unregisterGlobals();
+
+if (get_magic_quotes_gpc())
+{
+	// Sanitize all request variables
+	$_GET    = sanitize($_GET);
+	$_POST   = sanitize($_POST);
+	$_COOKIE = sanitize($_COOKIE);
+}
+
+if (ini_get('register_globals'))
+{
+	// Reverse the effects of register_globals
+	unregisterGlobals();
+}	
+	
+
 callHook();
 ?>
